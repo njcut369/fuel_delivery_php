@@ -1,0 +1,114 @@
+{% extends "main.html.twig" %} {% set show_footer = false %} {% block content %}
+<style>
+  /* Custom Styles */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+  }
+  .order-section {
+    padding: 50px 0;
+  }
+  .footer {
+    background-color: #343a40;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+  }
+</style>
+
+<!-- Order Section -->
+<section class="order-section">
+  <div class="container">
+    <h2>Order Fuel</h2>
+    <form id="order-form">
+      <!-- Fuel Type -->
+      <div class="mb-3">
+        <label for="fuelType" class="form-label">Fuel Type</label>
+        <select id="fuelType" class="form-select">
+          <option value="petrol">Petrol</option>
+          <option value="diesel">Diesel</option>
+          <option value="gasoline">Gasoline</option>
+        </select>
+      </div>
+
+      <!-- Quantity -->
+      <div class="mb-3">
+        <label for="quantity" class="form-label">Quantity (Litres)</label>
+        <input type="number" id="quantity" class="form-control" min="1" required />
+      </div>
+
+      <!-- Delivery Address -->
+      <div class="mb-3">
+        <label for="address" class="form-label">Delivery Address</label>
+        <input type="text" id="address" class="form-control" placeholder="Enter your address" required />
+      </div>
+
+      <!-- Summary Section -->
+      <div class="mb-3">
+        <h5>Summary</h5>
+        <p id="orderSummary">Please fill in all fields to see your order summary.</p>
+      </div>
+
+      <!-- Payment Type -->
+      <div class="mb-3">
+        <label for="paymentType" class="form-label">Payment Type</label>
+        <select id="paymentType" class="form-select">
+          <option value="cod">Cash on Delivery</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card Payment</option>
+        </select>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-warning">Place Order</button>
+    </form>
+  </div>
+</section>
+
+<script>
+  document.querySelector('form').addEventListener('input', function () {
+    const fuelType = document.getElementById('fuelType').value;
+    const quantity = document.getElementById('quantity').value;
+    const address = document.getElementById('address').value;
+    const paymentType = document.getElementById('paymentType').value;
+    let summaryText = 'Please fill in all fields to see your order summary.';
+    if (fuelType && quantity && address) {
+      summaryText = `You have selected ${quantity} litre(s) of ${fuelType}. Delivery to: ${address}. Payment Method: ${paymentType}.`;
+    }
+    document.getElementById('orderSummary').innerText = summaryText;
+  });
+</script>
+<script>
+  const accessToken = localStorage.getItem('access_token');
+  document.getElementById('order-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const fuelType = document.getElementById('fuelType').value;
+    const quantity = document.getElementById('quantity').value;
+    const address = document.getElementById('address').value;
+    const paymentType = document.getElementById('paymentType').value;
+
+    fetch('{{api_host}}/api/order/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ fuel_type: fuelType, quantity, address, payment_type: paymentType }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.id) {
+          const orderId = data.id;
+          window.location.href = `/order/success/${orderId}`;
+        } else {
+          alert('Failed to place order. Please try again.');
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again later.');
+      });
+  });
+</script>
+
+{% endblock content %}

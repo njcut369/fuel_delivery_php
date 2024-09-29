@@ -1,0 +1,118 @@
+{% extends 'main.html.twig' %}
+{% set show_footer = false %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Manage Orders</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fuel Type</th>
+        <th>Quantity</th>
+        <th>User</th>
+        <th>Address</th>
+        <th>Payment Type</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="order-table-body">
+      <!-- Order rows will be populated here via JavaScript -->
+    </tbody>
+  </table>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function () {
+    const accessToken = localStorage.getItem('access_token');
+
+    // Fetch orders data from the API
+    $.ajax({
+      url: '{{api_host}}//api/all_orders/',  // Updated endpoint
+      type: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      },
+      success: function (data) {
+        console.log('API Response:', data);  // Log response to inspect structure
+
+        let orderRows = '';
+        
+        // Assuming data is an array or contains an array of orders
+        const orders = data.results || data; // Adjust based on actual structure
+
+        if (Array.isArray(orders)) {
+          orders.forEach(function (order) {
+            orderRows += `
+              <tr>
+                <td>${order.id}</td>
+                <td>${order.fuel_type}</td>
+                <td>${order.quantity}</td>
+                <td>${order.user.username}</td>
+                <td>${order.address}</td>
+                <td>${order.payment_type}</td>
+                <td>${order.status}</td>
+                <td>${new Date(order.created_at).toLocaleDateString()}</td>
+                <td>
+                  <button class="btn btn-sm btn-success btn-status" data-id="${order.id}">Mark as Delivered</button>
+                  <a href="#" class="btn btn-sm btn-danger btn-delete" data-id="${order.id}">Delete</a>
+                </td>
+              </tr>
+            `;
+          });
+          $('#order-table-body').html(orderRows);
+          
+          // Handle status change
+          $('.btn-status').on('click', function () {
+            const orderId = $(this).data('id');
+            $.ajax({
+              url: `{{api_host}}/api/all_orders/${orderId}/`,
+              type: 'PATCH',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`
+              },
+              data: { status: 'Success' },
+              success: function () {
+                $(this).closest('tr').find('.badge').text('Delivered').removeClass('badge-warning').addClass('badge-info');
+              }.bind(this),
+              error: function () {
+                alert('An error occurred while updating the order.');
+              }
+            });
+          });
+
+          // Handle delete order
+          $('.btn-delete').on('click', function () {
+            const orderId = $(this).data('id');
+            $.ajax({
+              url: `{{api_host}}/api/all_orders/${orderId}/`,
+              type: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`
+              },
+              success: function () {
+                $(this).closest('tr').remove();
+              }.bind(this),
+              error: function () {
+                alert('An error occurred while deleting the order.');
+              }
+            });
+          });
+
+        } else {
+          alert('Unexpected response format.');
+        }
+      },
+      error: function (xhr) {
+        if (xhr.status === 403) {
+          alert('You do not have permission to view this content.');
+        } else {
+          alert('An error occurred while fetching the orders.');
+        }
+      }
+    });
+  });
+</script>
+{% endblock content %}

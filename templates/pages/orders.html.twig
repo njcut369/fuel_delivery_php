@@ -1,0 +1,145 @@
+{% extends 'main.html.twig' %}
+{% set show_footer = false %}
+{% block content %}
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+  }
+  .orders-section {
+    padding: 50px 0;
+  }
+  .map-placeholder {
+    width: 100%;
+    height: 300px;
+    background-color: #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #666;
+    font-size: 18px;
+    border-radius: 8px;
+  }
+  .no-orders {
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  .no-account-details {
+    display: none;
+  }
+</style>
+
+<!-- Orders Section -->
+<section class="orders-section">
+  <div class="container">
+    <h2>Your Orders</h2>
+    <div class="row">
+      <div class="col-lg-6">
+        <!-- Order History -->
+        <h3>Order History</h3>
+        <ul id="order-history" class="list-group mb-4">
+          <!-- Order history items will be dynamically inserted here -->
+        </ul>
+        <div id="no-order-history" class="no-orders" style="display: none;">
+          No order history available.
+        </div>
+        
+        <!-- Current Orders -->
+        <h3>Current Orders</h3>
+        <ul id="current-orders" class="list-group mb-4">
+          <!-- Current orders will be dynamically inserted here -->
+        </ul>
+        <div id="no-current-orders" class="no-orders" style="display: none;">
+          No current orders available.
+        </div>
+
+        <!-- Account Details -->
+        <div id="account-details" class="mb-4 no-account-details">
+          <h3>Account Details</h3>
+          <p><strong>Email:</strong> <span id="user-email"></span></p>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <!-- Live Location Map Placeholder -->
+        <h3>Live Location</h3>
+        <div class="map-placeholder">Map Showing Current Delivery Location</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Function to fetch order data and populate the page
+  async function fetchOrders() {
+    try {
+      const response = await fetch('{{api_host}}/api/order/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch order data');
+      }
+      const data = await response.json();
+
+      // Check if data is empty
+      const orderHistoryElement = document.getElementById('order-history');
+      const currentOrdersElement = document.getElementById('current-orders');
+      const noOrderHistoryElement = document.getElementById('no-order-history');
+      const noCurrentOrdersElement = document.getElementById('no-current-orders');
+      const accountDetailsElement = document.getElementById('account-details');
+      
+      if (data.length === 0) {
+        noOrderHistoryElement.style.display = 'block';
+        noCurrentOrdersElement.style.display = 'block';
+        accountDetailsElement.style.display = 'none'; // Hide account details section
+      } else {
+        noOrderHistoryElement.style.display = 'none';
+        noCurrentOrdersElement.style.display = 'none';
+        accountDetailsElement.style.display = 'block'; // Show account details section
+
+        // Populate Order History and Current Orders
+        let hasOrders = false; // Flag to check if any orders exist
+
+        data.forEach(order => {
+          const orderItem = `<li class="list-group-item">
+            Order #${order.id} - ${order.quantity} Litres of ${order.fuel_type} - ${order.status === 'Success' ? 'Delivered' : 'Expected Delivery'} on ${new Date(order.created_at).toLocaleDateString()}
+          </li>`;
+          
+          if (order.status === 'Success') {
+            orderHistoryElement.innerHTML += orderItem;
+            hasOrders = true;
+          } else {
+            currentOrdersElement.innerHTML += orderItem;
+            hasOrders = true;
+          }
+        });
+
+        if (!hasOrders) {
+          noOrderHistoryElement.style.display = 'block';
+          noCurrentOrdersElement.style.display = 'block';
+        }
+
+        // Populate Account Details
+        const user = data[0]?.user || {};
+        document.getElementById('user-email').textContent = user.username || 'N/A';
+        document.getElementById('user-phone').textContent = user.phone || 'N/A';
+        document.getElementById('user-address').textContent = user.address || 'N/A';
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Fetch orders when the page loads
+  document.addEventListener('DOMContentLoaded', fetchOrders);
+</script>
+
+{% endblock %}
