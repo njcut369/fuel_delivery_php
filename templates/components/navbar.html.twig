@@ -15,10 +15,18 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-        <li class="nav-item"><a class="nav-link" href="#why-choose-us">Why Choose Us</a></li>
         <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
         <li class="nav-item"><a class="nav-link" href="/orders">Orders</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" id="logout-btn">Logout</a></li>
       </ul>
     </div>
   </div>
 </nav>
+<script>
+  document.querySelector('#logout-btn').addEventListener('click', function(event) {
+    event.preventDefault();
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    window.location.href = '/login';
+  });
+</script>

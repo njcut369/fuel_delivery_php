@@ -1,71 +1,148 @@
-{% extends "main.html.twig" %} {% set show_footer = false %} {% block content %}
+{% extends "main.html.twig" %}
+{% set show_footer = false %}
+{% block content %}
 <style>
   /* Custom Styles */
   body {
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
   }
+
   .order-section {
     padding: 50px 0;
   }
+
   .footer {
     background-color: #343a40;
     color: white;
     padding: 20px 0;
     text-align: center;
   }
+
+  /* Responsive Map */
+  .map-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 56.25%;
+    /* 16:9 Aspect Ratio */
+  }
+
+  .map-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* Layout Adjustment for Two Columns */
+  @media (min-width: 768px) {
+    .order-col {
+      border-right: 1px solid #ddd;
+      padding-right: 30px;
+    }
+
+    .map-col {
+      padding-left: 30px;
+    }
+  }
 </style>
 
 <!-- Order Section -->
 <section class="order-section">
   <div class="container">
-    <h2>Order Fuel</h2>
-    <form id="order-form">
-      <!-- Fuel Type -->
-      <div class="mb-3">
-        <label for="fuelType" class="form-label">Fuel Type</label>
-        <select id="fuelType" class="form-select">
-          <option value="petrol">Petrol</option>
-          <option value="diesel">Diesel</option>
-          <option value="gasoline">Gasoline</option>
-        </select>
+    <div class="row">
+      <!-- Left Column: Order Details -->
+      <div class="col-md-6 order-col">
+        <h2>Order Fuel</h2>
+        <form id="order-form">
+          <!-- Fuel Type -->
+          <div class="mb-3">
+            <label for="fuelType" class="form-label">Fuel Type</label>
+            <select id="fuelType" class="form-select">
+              <option value="petrol">Petrol</option>
+              <option value="diesel">Diesel</option>
+              <option value="gasoline">Gasoline</option>
+            </select>
+          </div>
+
+          <!-- Quantity -->
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Quantity (Litres)</label>
+            <input type="number" id="quantity" class="form-control" min="1" value="1" required />
+          </div>
+
+          <!-- Delivery Address -->
+          <div class="mb-3">
+            <label for="address" class="form-label">Delivery Address</label>
+            <input type="text" id="address" class="form-control" placeholder="Enter your address" value="Jawaharlal Nehru Institute of Arts & Science" required />
+          </div>
+
+          <!-- Summary Section -->
+          <div class="mb-3">
+            <h5>Summary</h5>
+            <p id="orderSummary">Please fill in all fields to see your order summary.</p>
+          </div>
+
+          <!-- Payment Type -->
+          <div class="mb-3">
+            <label for="paymentType" class="form-label">Payment Type</label>
+            <select id="paymentType" class="form-select">
+              <option value="cod">Cash on Delivery</option>
+              <option value="upi">UPI</option>
+              <option value="card">Card Payment</option>
+            </select>
+          </div>
+
+          <!-- Payment Details Section -->
+          <div id="paymentDetails" class="mb-3" style="display: none;">
+            <!-- Card Payment Fields -->
+            <div id="cardDetails" style="display: none;">
+              <div class="mb-3">
+                <label for="cardNumber" class="form-label">Card Number</label>
+                <input type="text" id="cardNumber" class="form-control" placeholder="Enter your card number" />
+              </div>
+              <div class="mb-3">
+                <label for="cardExpiry" class="form-label">Expiry Date</label>
+                <input type="text" id="cardExpiry" class="form-control" placeholder="MM/YY" />
+              </div>
+              <div class="mb-3">
+                <label for="cardCVV" class="form-label">CVV</label>
+                <input type="text" id="cardCVV" class="form-control" placeholder="CVV" />
+              </div>
+            </div>
+
+            <!-- UPI Payment Fields -->
+            <div id="upiDetails" style="display: none;">
+              <div class="mb-3">
+                <label for="upiId" class="form-label">UPI ID</label>
+                <input type="text" id="upiId" class="form-control" placeholder="Enter your UPI ID" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-warning">Place Order</button>
+        </form>
       </div>
 
-      <!-- Quantity -->
-      <div class="mb-3">
-        <label for="quantity" class="form-label">Quantity (Litres)</label>
-        <input type="number" id="quantity" class="form-control" min="1" required />
+      <!-- Right Column: Static Map -->
+      <div class="col-md-6 map-col">
+        <h2>Delivery Location</h2>
+        <div class="map-container">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3931.7103171076897!2d77.20683147623359!3d9.790560390304414!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b07a81f8902db69%3A0xcc857efd93551cdd!2sJawaharlal%20Nehru%20Institute%20of%20Arts%20%26%20Science!5e0!3m2!1sen!2sin!4v1728209286754!5m2!1sen!2sin"
+            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
       </div>
-
-      <!-- Delivery Address -->
-      <div class="mb-3">
-        <label for="address" class="form-label">Delivery Address</label>
-        <input type="text" id="address" class="form-control" placeholder="Enter your address" required />
-      </div>
-
-      <!-- Summary Section -->
-      <div class="mb-3">
-        <h5>Summary</h5>
-        <p id="orderSummary">Please fill in all fields to see your order summary.</p>
-      </div>
-
-      <!-- Payment Type -->
-      <div class="mb-3">
-        <label for="paymentType" class="form-label">Payment Type</label>
-        <select id="paymentType" class="form-select">
-          <option value="cod">Cash on Delivery</option>
-          <option value="upi">UPI</option>
-          <option value="card">Card Payment</option>
-        </select>
-      </div>
-
-      <!-- Submit Button -->
-      <button type="submit" class="btn btn-warning">Place Order</button>
-    </form>
+    </div>
   </div>
 </section>
 
 <script>
+  // Update summary on form input
   document.querySelector('form').addEventListener('input', function () {
     const fuelType = document.getElementById('fuelType').value;
     const quantity = document.getElementById('quantity').value;
@@ -77,8 +154,29 @@
     }
     document.getElementById('orderSummary').innerText = summaryText;
   });
-</script>
-<script>
+
+  // Show/hide payment details based on selected payment type
+  document.getElementById('paymentType').addEventListener('change', function () {
+    const paymentType = this.value;
+    const paymentDetails = document.getElementById('paymentDetails');
+    const cardDetails = document.getElementById('cardDetails');
+    const upiDetails = document.getElementById('upiDetails');
+
+    // Reset visibility
+    paymentDetails.style.display = 'block';
+    cardDetails.style.display = 'none';
+    upiDetails.style.display = 'none';
+
+    if (paymentType === 'card') {
+      cardDetails.style.display = 'block';
+    } else if (paymentType === 'upi') {
+      upiDetails.style.display = 'block';
+    } else {
+      paymentDetails.style.display = 'none';
+    }
+  });
+
+  // Handle form submission
   const accessToken = localStorage.getItem('access_token');
   document.getElementById('order-form').addEventListener('submit', function (event) {
     event.preventDefault();
@@ -86,6 +184,20 @@
     const quantity = document.getElementById('quantity').value;
     const address = document.getElementById('address').value;
     const paymentType = document.getElementById('paymentType').value;
+    let paymentData = {};
+
+    // Collect payment data based on payment type
+    if (paymentType === 'card') {
+      paymentData = {
+        cardNumber: document.getElementById('cardNumber').value,
+        cardExpiry: document.getElementById('cardExpiry').value,
+        cardCVV: document.getElementById('cardCVV').value,
+      };
+    } else if (paymentType === 'upi') {
+      paymentData = {
+        upiId: document.getElementById('upiId').value,
+      };
+    }
 
     fetch('{{api_host}}/api/order/', {
       method: 'POST',
@@ -93,7 +205,13 @@
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ fuel_type: fuelType, quantity, address, payment_type: paymentType }),
+      body: JSON.stringify({
+        fuel_type: fuelType,
+        quantity,
+        address,
+        payment_type: paymentType,
+        payment_data: paymentData,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -106,9 +224,8 @@
       })
       .catch((error) => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again later.');
+        alert('An error occurred. Please try again.');
       });
   });
 </script>
-
-{% endblock content %}
+{% endblock %}
