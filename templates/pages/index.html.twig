@@ -13,12 +13,30 @@
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
   }
+
   .hero-section {
-    padding-top: 10rem;
+    background-image: url('../../images/2.jpeg');
+    /* Replace with your image URL */
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
     color: white;
-    padding-bottom: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
   }
+
+  .overlay {
+    background: rgba(0, 0, 0, 0.5);
+    /* Dark overlay for better text visibility */
+    padding: 20px;
+  }
+
+  .cta-button {
+    margin-top: 20px;
+  }
+
   .services-section,
   .why-choose-us,
   .testimonials-section {
@@ -28,7 +46,7 @@
 
 <!-- Hero Section -->
 <section class="hero-section bg-warning">
-  <div class="container">
+  <div style="margin-bottom: 300px;" class="container">
     <h1 style="font-size: 57px">Welcome to Fuel Drop</h1>
     <h5>Your reliable fuel delivery service</h5>
     <a class="btn btn-light mt-4 btn-lg" href="/order">Order Now</a>
@@ -50,6 +68,8 @@
     </div>
   </div>
 </section>
+
+<img style="width: 100%; margin-bottom: 1rem;" src="../../images/1.jpg" alt="">
 
 <!-- Why Choose Us Section -->
 <section id="why-choose-us" class="why-choose-us bg-dark text-white container px-5 rounded-5">

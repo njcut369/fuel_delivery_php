@@ -8,6 +8,7 @@ use Twig\Environment;
 $loader = new FilesystemLoader(__DIR__ . '/templates');
 $twig = new Environment($loader);
 
+// $api_host = "https://fuel-delivery.jerit.in";
 $api_host = "http://127.0.0.1:8000";
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
